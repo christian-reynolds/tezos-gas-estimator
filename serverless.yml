@@ -1,0 +1,25 @@
+service: tezos-estimator
+frameworkVersion: "3"
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+
+functions:
+  getContractMethods:
+    handler: handler.getContractMethods
+    events:
+      - httpApi:
+          path: /contractMethods
+          method: get
+  estimateGas:
+    handler: handler.estimateGasForMint
+    events:
+      - httpApi:
+          path: /estimateGas
+          method: get
+
+plugins:
+  - serverless-esbuild
+  - serverless-offline

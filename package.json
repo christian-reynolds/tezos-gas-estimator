@@ -1,0 +1,12 @@
+{
+  "devDependencies": {
+    "esbuild": "^0.15.13",
+    "serverless-esbuild": "^1.33.1",
+    "serverless-offline": "^11.3.0"
+  },
+  "dependencies": {
+    "@taquito/contracts-library": "^14.0.0",
+    "@taquito/signer": "^14.0.0",
+    "@taquito/taquito": "^14.0.0"
+  }
+}
