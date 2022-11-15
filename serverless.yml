@@ -5,6 +5,9 @@ useDotenv: true
 provider:
   name: aws
   runtime: nodejs16.x
+  environment:
+    PRIVATE_KEY: ${env:PRIVATE_KEY}
+    CONTRACT_ADDRESS: ${env:CONTRACT_ADDRESS}
 
 functions:
   getContractMethods:
@@ -14,11 +17,11 @@ functions:
           path: /contractMethods
           method: get
   estimateGas:
-    handler: handler.estimateGasForMint
+    handler: handler.estimateGasForMethod
     events:
       - httpApi:
           path: /estimateGas
-          method: get
+          method: post
 
 plugins:
   - serverless-esbuild

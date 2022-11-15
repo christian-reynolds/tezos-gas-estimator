@@ -29,16 +29,22 @@ const getContractMethods = async () => {
   }
 };
 
-const estimateGasForMint = async () => {
+const estimateGasForMethod = async (event) => {
+  if (!event.body) {
+    return {
+      statusCode: 400,
+      message: "You must pass in a methodName and methodArguments",
+    };
+  }
+  const { methodName, methodArguments } = JSON.parse(event.body);
+
   try {
     const contract = await Tezos.contract.at(CONTRACT_ADDRESS);
-    const operation = await contract.methodsObject
-      .mint({
-        issuer_id: 21113,
-      })
-      .toTransferParams({
-        amount: 2,
-      });
+    const operation = await contract.methodsObject[methodName](
+      methodArguments
+    ).toTransferParams({
+      amount: 2,
+    });
     console.log({ operation });
     const estimate = await Tezos.estimate.transfer(operation);
 
