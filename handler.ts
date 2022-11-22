@@ -1,10 +1,7 @@
 "use strict";
 
-import BigNumber from "bignumber.js";
 import { TezosToolkit } from "@taquito/taquito";
 import { InMemorySigner } from "@taquito/signer";
-
-const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS || "";
 
 const Tezos = new TezosToolkit("https://mainnet.api.tez.ie/");
 
@@ -12,9 +9,25 @@ Tezos.setProvider({
   signer: new InMemorySigner(process.env.PRIVATE_KEY || ""),
 });
 
-const getContractMethods = async () => {
+const getContractMethods = async (event) => {
+  if (!event.body) {
+    return {
+      statusCode: 400,
+      message: "No body passed in",
+    };
+  }
+
+  const { contract_address } = JSON.parse(event.body);
+
+  if (!contract_address) {
+    return {
+      statusCode: 400,
+      message: "You must include a contract address",
+    };
+  }
+
   try {
-    const contract = await Tezos.contract.at(CONTRACT_ADDRESS);
+    const contract = await Tezos.contract.at(contract_address);
 
     let methods = contract.parameterSchema.ExtractSignatures();
     return {
@@ -33,31 +46,46 @@ const estimateGasForMethod = async (event) => {
   if (!event.body) {
     return {
       statusCode: 400,
-      message: "You must pass in a methodName and methodArguments",
+      message: "No body passed in",
     };
   }
-  const { methodName, methodArguments } = JSON.parse(event.body);
+
+  const { methodName, methodArguments, amount, contract_address } = JSON.parse(
+    event.body
+  );
+
+  if (!methodName || !methodArguments || !contract_address) {
+    return {
+      statusCode: 400,
+      message:
+        "You must provide a contract_address, methodName, and methodArguments",
+    };
+  }
 
   try {
-    const contract = await Tezos.contract.at(CONTRACT_ADDRESS);
+    const contract = await Tezos.contract.at(contract_address);
     const operation = await contract.methodsObject[methodName](
       methodArguments
     ).toTransferParams({
-      amount: 2,
+      amount: amount ?? 2,
     });
     console.log({ operation });
     const estimate = await Tezos.estimate.transfer(operation);
 
     return {
       statusCode: 200,
-      body: JSON.stringify({
-        gasLimit: estimate.gasLimit,
-        minimalFeeMutez: estimate.minimalFeeMutez,
-        storageLimit: estimate.storageLimit,
-        suggestedFeeMutez: estimate.suggestedFeeMutez,
-        totalCost: estimate.totalCost,
-        usingBaseFeeMutez: estimate.usingBaseFeeMutez,
-      }),
+      body: JSON.stringify(
+        {
+          gasLimit: estimate.gasLimit,
+          minimalFeeMutez: estimate.minimalFeeMutez,
+          storageLimit: estimate.storageLimit,
+          suggestedFeeMutez: estimate.suggestedFeeMutez,
+          totalCost: estimate.totalCost,
+          usingBaseFeeMutez: estimate.usingBaseFeeMutez,
+        },
+        null,
+        2
+      ),
     };
   } catch (error) {
     return {
@@ -67,4 +95,4 @@ const estimateGasForMethod = async (event) => {
   }
 };
 
-export { getContractMethods, estimateGasForMint };
+export { getContractMethods, estimateGasForMethod };
