@@ -6,7 +6,7 @@ import { InMemorySigner } from "@taquito/signer";
 const Tezos = new TezosToolkit("https://mainnet.api.tez.ie/");
 
 Tezos.setProvider({
-  signer: new InMemorySigner(process.env.PRIVATE_KEY || ""),
+  signer: new InMemorySigner(process.env.TEZOS_ESTIMATOR || ""),
 });
 
 const getContractMethods = async (event) => {

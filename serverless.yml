@@ -4,14 +4,14 @@ useDotenv: true
 
 custom:
   serverlessSsmFetch:
-    PRIVATE_KEY: /tezos/estimator/private_key
+    TEZOS_ESTIMATOR: TEZOS_ESTIMATOR
 
 provider:
   name: aws
   runtime: nodejs16.x
-  profile: discord-bot
+  profile: serverless-estimator
   environment:
-    PRIVATE_KEY: ${env:PRIVATE_KEY}
+    TEZOS_ESTIMATOR: ${env:TEZOS_ESTIMATOR}
 
 functions:
   getContractMethods:

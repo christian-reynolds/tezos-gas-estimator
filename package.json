@@ -2,7 +2,7 @@
   "devDependencies": {
     "esbuild": "^0.15.13",
     "serverless-esbuild": "^1.33.1",
-    "serverless-offline": "^11.3.0",
+    "serverless-offline": "^11.6.0",
     "serverless-ssm-fetch": "^2.0.0"
   },
   "dependencies": {
